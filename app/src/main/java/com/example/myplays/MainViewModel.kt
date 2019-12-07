@@ -15,20 +15,35 @@ import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
 	
+	/**
+	 * @param videoData: the video data picked from gallery
+	 * @param imageIds: all the selected images for performance
+	 * @param removeIds: save the removeIds to make ui correct when configuration change
+	 */
+	
 	private val _videoData = MutableLiveData<Uri>()
 	val videoData = _videoData
 	
 	private val _imageIds = MutableLiveData<List<Long>>()
 	val imageIds = _imageIds
 	
+	private val _removeIds = arrayListOf<Long>()
+	val removeIds = _removeIds
+	
+	
 	//Animation for removing selected image
-	fun startGoneAnim(view: View, button: View, fn: () -> Unit) {
+	fun startGoneAnim(view: View, button: View, removeId: Long, fn: () -> Unit) {
 		val scaleX = ObjectAnimator.ofFloat(view, "ScaleX", 1f, 0f).apply { duration = 500 }
 		val scaleY = ObjectAnimator.ofFloat(view, "ScaleY", 1f, 0f).apply { duration = 500 }
 		AnimatorSet().run {
 			playTogether(scaleX, scaleY)
-			doOnStart { button.isClickable = false }
-			doOnEnd { fn() }
+			doOnStart {
+				button.isClickable = false
+			}
+			doOnEnd {
+				fn()
+				_removeIds.add(removeId)
+			}
 			start()
 		}
 	}

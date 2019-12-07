@@ -49,6 +49,8 @@ class MyVideoViewLayout : FrameLayout {
             setTextColor(Color.WHITE)
         }
         tvTime.text = getTimeText(0)
+        
+        
 
 
 

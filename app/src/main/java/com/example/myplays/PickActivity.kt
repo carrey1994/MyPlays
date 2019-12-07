@@ -2,10 +2,12 @@ package com.example.myplays
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.picker_view.*
 
 class PickActivity : AppCompatActivity() {
@@ -30,6 +32,8 @@ class PickActivity : AppCompatActivity() {
 					pickViewModel.pickPhotos.add(photoModel.index)
 				else
 					pickViewModel.pickPhotos.remove(photoModel.index)
+				Log.e("XXXX===", "${Gson().toJson(photoModel)} ===")
+				Log.e("ZZZZ===", "${pickViewModel.pickPhotos.size} ===")
 			}
 		})
 		rv_photo.adapter = adapter
@@ -41,6 +45,7 @@ class PickActivity : AppCompatActivity() {
 			val intent = Intent()
 			intent.putExtra(IMAGES_ID, pickViewModel.pickPhotos)
 			setResult(RESULT_PHOTO_CODE, intent)
+			Log.e("CCCCCC===", "${pickViewModel.pickPhotos.size} ===")
 			finish()
 		}
 	}

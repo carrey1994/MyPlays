@@ -20,11 +20,11 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
-	
+
 	private val mainViewModel by lazy {
 		ViewModelProviders.of(this).get(MainViewModel::class.java)
 	}
-	
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
 		observeVideoData()
 		observeImageIds()
 	}
-	
+
 	private fun setupViewsListeners() {
 		btn_video.setOnClickListener {
 			val videoIntent = Intent()
@@ -40,22 +40,23 @@ class MainActivity : AppCompatActivity() {
 			videoIntent.action = Intent.ACTION_GET_CONTENT
 			startActivityForResult(Intent.createChooser(videoIntent, "Get Video"), REQUEST_TAKE_GALLERY_VIDEO)
 		}
-		
+
 		btn_photo.setOnClickListener {
 			val permission = ActivityCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE)
 			if (permission != PackageManager.PERMISSION_GRANTED) {
 				//Request for Permission
 				ActivityCompat.requestPermissions(this, arrayOf(READ_EXTERNAL_STORAGE), REQUEST_TAKE_GALLERY_PHOTO)
 			} else {
-				//Wait and Go to pick images
+				//Wait and Go to pick images and clear removeIds
 				val mIntent = Intent(this, PickActivity::class.java)
 				val hashMap = mainViewModel.searchImages(contentResolver)
 				mIntent.putExtra(SEARCH_DATA, hashMap)
+                mainViewModel.removeIds.clear()
 				startActivityForResult(mIntent, RESULT_PHOTO_CODE)
 			}
 		}
 	}
-	
+
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 		super.onActivityResult(requestCode, resultCode, data)
 		when (resultCode) {
@@ -71,27 +72,28 @@ class MainActivity : AppCompatActivity() {
 				mainViewModel.videoData.postValue(data!!.data)
 			}
 		}
-		
+
 	}
-	
+
 	//If get the video, set data to video view
 	private fun observeVideoData() = mainViewModel.videoData.observe(this, Observer {
 		cv_video.visibility = View.VISIBLE
 		video_view.setVideoData(it)
 	})
-	
-	
-	//If get the imageIds, generate views to horizontal layout
+
+
+	//If get the imageIds, generate views and add them into horizontal layout
 	private fun observeImageIds() = mainViewModel.imageIds.observe(this, Observer {
 		it.forEach { id ->
+			if (mainViewModel.removeIds.contains(id)) return@forEach
 			val view = LayoutInflater.from(this).inflate(R.layout.layout_photo, ll_photos as ViewGroup, false)
 			val imageUri = ContentUris.withAppendedId(EXTERNAL_CONTENT_URI, id)
 			view.findViewById<ImageView>(R.id.si_photo).setImageURI(imageUri)
-			view.findViewById<ImageView>(R.id.iv_remove).setOnClickListener {
-				mainViewModel.startGoneAnim(view, it) { ll_photos.removeView(view) }
+			view.findViewById<ImageView>(R.id.iv_remove).setOnClickListener { btn ->
+				mainViewModel.startGoneAnim(view, btn, id) { ll_photos.removeView(view) }
 			}
 			ll_photos.addView(view)
 		}
 	})
-	
+
 }

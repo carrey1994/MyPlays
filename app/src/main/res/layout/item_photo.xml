@@ -1,40 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	android:layout_width="wrap_content"
-	android:layout_height="wrap_content"
-	android:gravity="center"
-	android:orientation="vertical"
-	android:padding="10dp">
-	
-	
-	<androidx.cardview.widget.CardView
-		android:layout_width="100dp"
-		android:layout_height="100dp"
-		app:cardCornerRadius="5dp">
-		
-		<FrameLayout
-			android:layout_width="match_parent"
-			android:layout_height="match_parent">
-			
-			<ImageView
-				android:id="@+id/iv_check"
-				android:layout_width="20dp"
-				android:layout_height="20dp"
-				android:layout_gravity="right|top"
-				android:layout_margin="10dp"
-				android:background="@drawable/selector_photo"
-				android:elevation="6dp" />
-			
-			<ImageView
-				android:id="@+id/iv_photo"
-				android:layout_width="100dp"
-				android:layout_height="100dp"
-				android:scaleType="centerCrop" />
-		
-		</FrameLayout>
-	
-	</androidx.cardview.widget.CardView>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="photo"
+            type="com.example.myplays.PhotoModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="10dp">
 
 
-</FrameLayout>
+        <androidx.cardview.widget.CardView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:cardCornerRadius="5dp">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/iv_check"
+                    selectShow="@{photo.check}"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="right|top"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/selector_photo"
+                    android:elevation="6dp" />
+
+                <ImageView
+                    android:id="@+id/iv_photo"
+                    photoBitmap="@{photo.bitmap}"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:scaleType="centerCrop" />
+
+            </FrameLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+    </FrameLayout>
+</layout>
