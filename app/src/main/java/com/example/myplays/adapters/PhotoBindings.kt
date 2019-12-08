@@ -1,4 +1,4 @@
-package com.example.myplays
+package com.example.myplays.adapters
 
 import android.graphics.Bitmap
 import android.view.View

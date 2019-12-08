@@ -1,4 +1,4 @@
-package com.example.myplays
+package com.example.myplays.ui
 
 import android.content.Context
 import android.graphics.Color

@@ -1,11 +1,9 @@
-package com.example.myplays
+package com.example.myplays.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 
 class SquareImage : ImageView {

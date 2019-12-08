@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -20,11 +21,11 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
-
+	
 	private val mainViewModel by lazy {
 		ViewModelProviders.of(this).get(MainViewModel::class.java)
 	}
-
+	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
@@ -32,31 +33,33 @@ class MainActivity : AppCompatActivity() {
 		observeVideoData()
 		observeImageIds()
 	}
-
+	
 	private fun setupViewsListeners() {
 		btn_video.setOnClickListener {
 			val videoIntent = Intent()
 			videoIntent.type = "video/*"
 			videoIntent.action = Intent.ACTION_GET_CONTENT
+			mainViewModel.videoData.postValue(null)
 			startActivityForResult(Intent.createChooser(videoIntent, "Get Video"), REQUEST_TAKE_GALLERY_VIDEO)
 		}
-
+		
 		btn_photo.setOnClickListener {
 			val permission = ActivityCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE)
 			if (permission != PackageManager.PERMISSION_GRANTED) {
 				//Request for Permission
 				ActivityCompat.requestPermissions(this, arrayOf(READ_EXTERNAL_STORAGE), REQUEST_TAKE_GALLERY_PHOTO)
 			} else {
-				//Wait and Go to pick images and clear removeIds
+				//Wait and Go to pick images and clear selected images, removeIds
 				val mIntent = Intent(this, PickActivity::class.java)
 				val hashMap = mainViewModel.searchImages(contentResolver)
 				mIntent.putExtra(SEARCH_DATA, hashMap)
-                mainViewModel.removeIds.clear()
+				mainViewModel.removeIds.clear()
+				ll_photos.removeAllViews()
 				startActivityForResult(mIntent, RESULT_PHOTO_CODE)
 			}
 		}
 	}
-
+	
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 		super.onActivityResult(requestCode, resultCode, data)
 		when (resultCode) {
@@ -69,19 +72,25 @@ class MainActivity : AppCompatActivity() {
 		when (requestCode) {
 			//Get the video and set video data
 			REQUEST_TAKE_GALLERY_VIDEO -> {
-				mainViewModel.videoData.postValue(data!!.data)
+				mainViewModel.videoData.postValue(data?.data)
 			}
 		}
-
+		
 	}
-
+	
 	//If get the video, set data to video view
 	private fun observeVideoData() = mainViewModel.videoData.observe(this, Observer {
-		cv_video.visibility = View.VISIBLE
+		if (it == null) {
+			video_view.visibility = View.GONE
+			return@Observer
+		}
 		video_view.setVideoData(it)
+		video_view.setRemoveFun {
+			mainViewModel.videoData.postValue(null)
+		}
 	})
-
-
+	
+	
 	//If get the imageIds, generate views and add them into horizontal layout
 	private fun observeImageIds() = mainViewModel.imageIds.observe(this, Observer {
 		it.forEach { id ->
@@ -95,5 +104,5 @@ class MainActivity : AppCompatActivity() {
 			ll_photos.addView(view)
 		}
 	})
-
+	
 }

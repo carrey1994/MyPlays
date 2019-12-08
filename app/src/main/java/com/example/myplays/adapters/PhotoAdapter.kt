@@ -1,8 +1,9 @@
-package com.example.myplays
+package com.example.myplays.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myplays.PhotoModel
 import com.example.myplays.databinding.ItemPhotoBinding
 
 class PhotoAdapter(private val photoModels: List<PhotoModel>) : RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder>() {

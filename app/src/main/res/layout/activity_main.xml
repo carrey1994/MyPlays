@@ -70,7 +70,6 @@
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:padding="20dp"
-			android:visibility="gone"
 			app:cardCornerRadius="8dp"
 			android:layout_marginTop="10dp"
 			android:layout_marginRight="10dp"
@@ -79,14 +78,15 @@
 			app:layout_constraintTop_toBottomOf="@id/hsv_photos"
 			tools:ignore="MissingConstraints">
 
-			<com.example.myplays.MyVideoViewLayout
+			<com.example.myplays.ui.MyVideoViewLayout
 				android:id="@+id/video_view"
+				android:visibility="gone"
 				android:layout_width="wrap_content"
 				android:layout_height="200dp" />
 
 		</androidx.cardview.widget.CardView>
 
-		<com.example.myplays.TagEditText
+		<com.example.myplays.ui.TagEditText
 			android:id="@+id/tag_edit_text"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
