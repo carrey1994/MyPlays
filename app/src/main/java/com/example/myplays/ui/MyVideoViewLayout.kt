@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.CountDownTimer
 import android.util.AttributeSet
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -24,9 +25,8 @@ class MyVideoViewLayout : FrameLayout {
 	private val ivClose: ImageView = ImageView(context)
 	private var tvTime: TextView = TextView(context)
 	private var remainTime: Long = 0
-	private lateinit var timer: CountDownTimer
+	private var timer: CountDownTimer? = null
 	private var removeFn: (() -> Unit)? = null
-	
 	
 	init {
 		//Play Button
@@ -35,7 +35,9 @@ class MyVideoViewLayout : FrameLayout {
 			scaleX = 0.33f
 			scaleY = 0.33f
 			elevation = 5f
+			isFocusable = false
 		}
+		
 		tvTime.apply {
 			val params = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
 			params.setMargins(10, 10, 10, 10)
@@ -49,13 +51,13 @@ class MyVideoViewLayout : FrameLayout {
 			setTextColor(Color.WHITE)
 			text = getTimeText(0)
 		}
+		
 		ivClose.apply {
 			val params = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
 			setImageDrawable(context.getDrawable(R.drawable.ic_remove))
 			setOnClickListener {
 				videoView.pause()
-				if (::timer.isInitialized)
-					timer.cancel()
+				timer?.cancel()
 				this@MyVideoViewLayout.visibility = View.GONE
 				removeFn?.invoke()
 			}
@@ -64,9 +66,6 @@ class MyVideoViewLayout : FrameLayout {
 			layoutParams = params
 		}
 		addView(ivClose)
-		
-		
-		
 		
 		videoView = FullVideoView(context).apply {
 			
@@ -87,7 +86,7 @@ class MyVideoViewLayout : FrameLayout {
 					ivPlay.visibility = View.INVISIBLE
 					ivClose.visibility = View.INVISIBLE
 					startTimer()
-					start()
+					videoView.start()
 				}
 			}
 			
@@ -95,6 +94,14 @@ class MyVideoViewLayout : FrameLayout {
 		addView(tvTime)
 		addView(ivPlay)
 		addView(videoView)
+	}
+	
+	fun resetVideo() {
+		ivPlay.visibility = View.VISIBLE
+		ivClose.visibility = View.VISIBLE
+		cancelTimer()
+		tvTime.text = getTimeText(0)
+		videoView.pause()
 	}
 	
 	private fun startTimer() {
@@ -108,18 +115,16 @@ class MyVideoViewLayout : FrameLayout {
 				remainTime = videoView.duration.toLong()
 			}
 		}
-		timer.start()
+		timer?.start()
 	}
 	
 	private fun cancelTimer() {
-		timer.cancel()
+		timer?.cancel()
 	}
 	
 	fun setVideoData(uri: Uri) {
 		visibility = View.VISIBLE
 		videoView.setVideoURI(uri)
-		videoView.start()
-		videoView.pause()
 		videoView.seekTo(1000)
 		videoView.setMediaController(null)
 	}
@@ -150,5 +155,6 @@ class MyVideoViewLayout : FrameLayout {
 	fun setRemoveFun(fn: (() -> Unit)) {
 		removeFn = fn
 	}
+	
 }
 

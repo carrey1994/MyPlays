@@ -46,8 +46,7 @@ class PhotoAdapter(private val photoModels: List<PhotoModel>) : RecyclerView.Ada
 	}
 	
 	
-	inner class PhotoViewHolder(private val binding: ItemPhotoBinding) :
-		RecyclerView.ViewHolder(binding.root) {
+	inner class PhotoViewHolder(private val binding: ItemPhotoBinding) : RecyclerView.ViewHolder(binding.root) {
 		
 		fun bind(photoModel: PhotoModel) {
 			binding.photo = photoModel

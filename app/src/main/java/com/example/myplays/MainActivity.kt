@@ -4,20 +4,22 @@ import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.content.ContentUris
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
+import android.os.PersistableBundle
 import android.provider.MediaStore.Images.Media.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import kotlinx.android.synthetic.main.activity_main.*
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.util.Log
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,6 +36,7 @@ class MainActivity : AppCompatActivity() {
 		observeImageIds()
 	}
 	
+	
 	private fun setupViewsListeners() {
 		btn_video.setOnClickListener {
 			val videoIntent = Intent()
@@ -49,13 +52,28 @@ class MainActivity : AppCompatActivity() {
 				//Request for Permission
 				ActivityCompat.requestPermissions(this, arrayOf(READ_EXTERNAL_STORAGE), REQUEST_TAKE_GALLERY_PHOTO)
 			} else {
-				//Wait and Go to pick images and clear selected images, removeIds
-				val mIntent = Intent(this, PickActivity::class.java)
-				val hashMap = mainViewModel.searchImages(contentResolver)
-				mIntent.putExtra(SEARCH_DATA, hashMap)
-				mainViewModel.removeIds.clear()
-				ll_photos.removeAllViews()
-				startActivityForResult(mIntent, RESULT_PHOTO_CODE)
+				waitSearchImages()
+			}
+		}
+	}
+	
+	//Go to pick images and clear selected images, removeIds
+	private fun waitSearchImages() {
+		val mIntent = Intent(this, PickActivity::class.java)
+		val hashMap = mainViewModel.searchImages(contentResolver)
+		mIntent.putExtra(SEARCH_DATA, hashMap)
+		mainViewModel.removeIds.clear()
+		ll_photos.removeAllViews()
+		startActivityForResult(mIntent, RESULT_PHOTO_CODE)
+	}
+	
+	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+		when (requestCode) {
+			REQUEST_TAKE_GALLERY_PHOTO -> {
+				if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					waitSearchImages()
+				}
 			}
 		}
 	}
@@ -82,8 +100,10 @@ class MainActivity : AppCompatActivity() {
 	private fun observeVideoData() = mainViewModel.videoData.observe(this, Observer {
 		if (it == null) {
 			video_view.visibility = View.GONE
+			video_view.resetVideo()
 			return@Observer
 		}
+		video_view.requestFocus()
 		video_view.setVideoData(it)
 		video_view.setRemoveFun {
 			mainViewModel.videoData.postValue(null)
