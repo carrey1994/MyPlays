@@ -50,6 +50,7 @@ class PhotoAdapter(private val photoModels: List<PhotoModel>) : RecyclerView.Ada
 		
 		fun bind(photoModel: PhotoModel) {
 			binding.photo = photoModel
+
 			binding.executePendingBindings()
 		}
 		

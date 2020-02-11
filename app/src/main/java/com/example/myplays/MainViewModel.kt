@@ -13,7 +13,7 @@ import androidx.core.animation.doOnStart
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class MainViewModel : ViewModel() {
+class MainViewModel : BaseViewModel() {
 	
 	/**
 	 * @param videoData: the video data picked from gallery

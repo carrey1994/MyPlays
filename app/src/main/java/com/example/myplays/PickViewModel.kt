@@ -9,26 +9,24 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 
-class PickViewModel : ViewModel() {
-
+class PickViewModel : BaseViewModel() {
+	
 	private val _photoLiveData = MutableLiveData<List<PhotoModel>>()
 	val photoLiveData = _photoLiveData
-
+	
 	private val _pickPhotos = arrayListOf<Long>()
 	val pickPhotos = _pickPhotos
-
+	
 	@SuppressLint("CheckResult")
 	fun dealData(searchData: HashMap<Boolean, *>, contentResolver: ContentResolver) {
 		val data = searchData[true] as List<Uri>
 		val ids = searchData[false] as List<Long>
-		Observable
-			.just(data)
+		Single.create<List<Uri>> { data }
 			.subscribeOn(Schedulers.io())
 			.map {
 				it.map {
@@ -46,10 +44,10 @@ class PickViewModel : ViewModel() {
 				{ error ->
 					Log.e("Error====>", "${error.message}")
 				}
-			)
+			).addTo(compositeDisposable)
 	}
-
-
+	
+	
 	@SuppressLint("Recycle")
 	fun searchImages(contentResolver: ContentResolver) {
 		val cursor = contentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, null, null, null)
@@ -68,5 +66,5 @@ class PickViewModel : ViewModel() {
 		hashMap[false] = imageIds
 		dealData(hashMap, contentResolver)
 	}
-
+	
 }

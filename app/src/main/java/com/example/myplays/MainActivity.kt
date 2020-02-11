@@ -20,6 +20,9 @@ import androidx.core.app.ComponentActivity.ExtraData
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.util.Log
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.myplays.adapters.RadioAdapter
+import com.example.myplays.adapters.RadioData
 
 
 class MainActivity : AppCompatActivity() {
@@ -32,8 +35,18 @@ class MainActivity : AppCompatActivity() {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
 		setupViewsListeners()
+		setupViews()
 		observeVideoData()
 		observeImageIds()
+	}
+	
+	private fun setupViews() {
+		rv_radio.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+		val arrayList = arrayListOf<RadioData>()
+		for (i in 0..100) {
+			arrayList.add(RadioData(i))
+		}
+		rv_radio.adapter = RadioAdapter(arrayList)
 	}
 	
 	
